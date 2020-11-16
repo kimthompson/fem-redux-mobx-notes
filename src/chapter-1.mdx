@@ -1,0 +1,288 @@
+---
+name: Chapter One - Redux without React
+route: /chapter-1
+---
+
+# Chapter One: Redux without React
+
+## Single State Store & Reducers
+
+### What is Redux?
+
+The whole state tree of your application is kept in one store -- one big 'ol JavaScript object.
+
+* You can take that blob, stringify it, then rehydrate your app with it to get the state of that app at that moment back. It's useful for testing and Cypress, as well as bug tracking.
+* This blob is the sole source of truth for your state.
+
+### One does not simply modify the state tree (but you can in MobX 😚)
+
+Instead, you dispatch actions. A thing has happened -> look at the current state of the world -> figure out what the new state of the world is.
+
+### Reducer function - the core of Redux
+
+A pure function that takes exactly two arguments:
+
+1. The current state of the world, that giant JSON object, effectively a bunch of props
+2. Some action that has happened
+
+And it outputs what the new state should be, using the logic you write. That is then spit out into your View, which is then rendered however you set it up to render. In React, that means that this state is then sent to the virtual DOM which is then rerendered with your new state. This effectively decouples application state from the React ecosystem.
+
+Redux forces action creator functions to remain pure. It will return the same action with the same inputs consistently.
+
+## Redux Functions
+
+Effectively, there are only **5** functions
+
+1. `applyMiddleware`
+2. `bindActionCreators`
+3. `combineReducers`
+4. `compose`
+5. `createStore`
+
+### `compose`
+
+It's effectively like `flow` or `pipe` from lodash. It's not unique to Redux at all, but it is quite useful!
+
+```javascript
+const {
+  createStore,
+  combineReducers,
+  compose,
+  bindActionCreators,
+  applyMiddleware
+} = Redux;
+
+const makeLouder = (string) => string.toUpperCase();
+const repeatThreeTimes = (string) => string.repeat(3);
+const embolden = (string) => string.bold();
+
+const makeLouderAndBoldAndRepeatThreeTimes = compose(embolden, repeatThreeTimes, makeLouder);
+
+console.log(makeLouderAndBoldAndRepeatThreeTimes('hello'));
+```
+
+## reducer & createStore
+
+### `createStore`
+
+It creates a store. A **store** is the state of our entire application and the ability to dispatch actions to change that state. It needs a function to work.
+
+```javascript
+const {
+  createStore,
+  combineReducers,
+  compose,
+  bindActionCreators,
+  applyMiddleware
+} = Redux;
+
+const makeLouder = (string) => string.toUpperCase();
+const repeatThreeTimes = (string) => string.repeat(3);
+const embolden = (string) => string.bold();
+
+createStore(() => {});
+```
+
+### `reducer`
+
+A reducer takes the state of the world and a thing that happened and spits out the new state of the world.
+
+```javascript
+const {
+  createStore,
+  combineReducers,
+  compose,
+  bindActionCreators,
+  applyMiddleware
+} = Redux;
+
+const makeLouder = (string) => string.toUpperCase();
+const repeatThreeTimes = (string) => string.repeat(3);
+const embolden = (string) => string.bold();
+
+const reducer = (state = { value: 1 }, action) => {
+  return state;
+};
+
+const store = createStore(reducer);
+```
+
+If you examine the keys on this store Object you'll see that there are `dispatch`, `subscribe`, `getState` and `replaceReducer` functions available to use.
+
+* `replaceReducer` is useful for code splitting, say, if in a deeper page of your app you want to use a reducer with more complexity.
+* `dispatch` we dispatch actions to change the state.
+* `getState` does what it says on the tin
+* `subscribe` fires an event every time the state of the world changes
+
+There's a library called **react-redux** that handles the `subscribe` and the like for you, but it'd be easy to do it yourself in an afternoon. You shouldn't, but you could.
+
+## Store dispatch & subscribe
+
+### `dispatch`
+
+```javascript
+const {
+  createStore,
+  combineReducers,
+  compose,
+  bindActionCreators,
+  applyMiddleware
+} = Redux;
+
+const makeLouder = (string) => string.toUpperCase();
+const repeatThreeTimes = (string) => string.repeat(3);
+const embolden = (string) => string.bold();
+
+const reducer = (state = { value: 1 }, action) => {
+  if (action.type === 'ADD') {
+    const value = state.value;
+    const amount = action.payload.amount;
+
+    // If we just reassign the value of state, won't know that anything changed, won't rerender
+    return {
+      value: value + amount;
+    }
+  }
+};
+
+const store = createStore(reducer);
+
+store.subscribe(() => { console.log('value', store.getState().value) }); // now THIS is not impure!
+
+store.dispatch({ type: 'ADD', payload: { amount: 2 }, meta: {} });
+store.dispatch({ type: 'ADD', payload: { amount: 2 }, meta: {} });
+store.dispatch({ type: 'ADD', payload: { amount: 2 }, meta: {} });
+
+store.unsubscribe();
+```
+
+Dispatch Objects need a type, which is basically a string describing what happened. He also recommends we follow *Redux standard actions* conventions, meaning we should include a `payload` object that contains the other info this dispatch might need. Occassionally his company will use `meta` for analytics and stuff.
+
+## combineReducers
+
+Imagine a world where the function above gets out of control. Like, say there's 100 or so different actions. We can split them off into their own files then combine them when we want to with `combineReducers`. Good for code splitting, lazy loading and things like this.
+
+### `combineReducers`
+
+```javascript
+const {
+  createStore,
+  combineReducers,
+  compose,
+  bindActionCreators,
+  applyMiddleware
+} = Redux;
+
+const makeLouder = (string) => string.toUpperCase();
+const repeatThreeTimes = (string) => string.repeat(3);
+const embolden = (string) => string.bold();
+
+const store = createStore(reducer);
+
+const calculatorReducer = (state = { value: 1 }, action) => {
+  if (action.type === 'ADD') {
+    const value = state.value;
+    const amount = action.payload.amount;
+    return {
+      value: value + amount
+    }
+  }
+
+  return state;
+}
+
+const reducer = combineReducers({
+  calculator: calculatorReducer
+});
+
+// replaceReducer takes a function and replaces it with another one
+
+const initial = {
+  calculator: 0,
+  error: 'No error'
+}
+
+console.log(reducer);
+```
+
+This is different from Flux, which would have you keep a bunch of smaller stores. Ours is one giant store.
+
+## bindActionCreators
+
+This will bind a function that creates "add" actions to the store's dispatch method to reduce unnecessary complexity when dispatching actions to the store.
+
+```javascript
+// continued from above
+const store = createStore(reducer);
+
+const calculatorReducer = (state = { value: 1 }, action) => {
+  if (action.type === 'ADD') {
+    const value = state.value;
+    const amount = action.payload.amount;
+    return {
+      value: value + amount
+    }
+  }
+
+  return state;
+}
+
+const reducer = combineReducers({
+  calculator: calculatorReducer
+});
+
+const initial = {
+  calculator: 0,
+  error: 'No error'
+}
+
+console.log(reducer);
+
+// doing this every time would be tedious
+<!--const addAction = {-->
+  <!--type: 'ADD',-->
+  <!--amount: 4-->
+<!--}-->
+
+const createAddAction = (amount) => {
+  return {
+    type: 'ADD',
+    payload: {
+      amount
+    }
+  }
+}
+
+// Even typing out store.dispatch around this each time it's called is tedious. Therefore, bind it.
+<!--store.dispatch(createAddAction(4));-->
+
+const dispatchAdd = bindActionCreator(createAddAction, store.dispatch);
+
+
+// There is also a plural version uwu and it basically works like this!
+const bindActionCreators = (actions, dispatch) => {
+  return Object.keys(actions).reduce((boundActions.key) => {
+    boundActions[key] = bindActionCreator(actions[key], dispatch)
+  }, {});
+}
+```
+
+## Middleware in Redux
+
+In between that action and it hitting the reducer, you can do other stuff (tm).
+
+### `applyMiddleware`
+
+```javascript
+// continued from above
+
+const logger = ({ getState }) => {
+  return next => action => {
+    console.log('MIDDLEWARE', getState(), action);
+    const value = next(action); // this is required, you chain middleware together
+    return value;
+  }
+};
+  
+const secondStore = createStore(reducer, applyMiddleware(logger));
+```

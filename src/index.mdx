@@ -1,0 +1,96 @@
+---
+name: State Management with Redux & MobX
+route: /
+---
+
+# State Management with Redux & MobX
+
+by Steve Kinney
+via Frontend Masters
+
+# Prologue
+
+## Introduction
+
+### Why is Redux good?
+
+* Doing a massive refactor of your state later is fraught with peril
+* Having really great state management inspires joy
+
+### Weaknesses?
+
+* It has no way to introduce side effects. For common tasks like loading data, some sort of middleware must be used. 
+  * Thunk
+  * Observable
+  * MobX
+
+### What will we build today?
+
+1. Counter
+2. Kanban board
+3. Simple app (vertical Kanban) with MobX
+4. Asyncronous calls (Autocomplete) with Observable
+5. Live Tweets with Thunk and Observable
+
+### This workshop is about _more_ than just the libraries.
+
+Libraries come and go. Most of the libs he taught 1.5 years ago are still here, as the JS ecosystem seems to be slowing down, but he's certain that these **patterns** and **approaches** will stick around. Especially since they can be traced back to the 70s. 🤣
+
+## Pure & Impure Functions
+
+### Terminology
+
+* **Pure functions** take arguments and return values based on just *those* arguments. Mathematical.
+* **Impure functions** can mutate things from outside their scope and/or produce side effects. Less mathematical.
+
+```javascript
+// Pure
+const add = (a, b) => {
+  return a + b;
+}
+
+// Impure
+const b;
+const add = (a) => {
+  return a + b;
+}
+
+const add = (a, b) => {
+  console.log('blah blah blah')
+  return a + b;
+}
+```
+
+Other examples of impure functions include console logs, API calls, mutating arrays and objects, etc.
+
+## Copy Instead of Mutate
+
+JavaScript is mutable by nature, so we have to learn to think a little differently to work with an immutable state manager like Redux. There are libraries for this like Immutable JS and Mori, but he's skeptical to bring them into production. You're adding a layer of complexity. Instead, his company writes some helper functions in vanilla JS and tests them heavily. 
+
+```javascript
+// Copy object
+const original = { a: 1, b: 2 };
+const copy = Object.assign({}, original);
+
+// with Babel
+const original = { a: 1, b: 2 };
+const copy = { ...original };
+
+// extend object
+const original = { a: 1, b: 2 };
+const extension = { c: 3 };
+const extended = { ...original, ...extension };
+
+// Copy array
+const original = [1, 2, 3];
+const copy = [1, 2, 3].slice();
+
+// with Babel
+const original = [1, 2, 3];
+const copy = [ ...original ];
+
+// NO push or pop. Extend like this.
+const original = [1, 2, 3];
+const extended = original.concat(4);
+const moreExtended = original.concat([4, 5]);
+```
