@@ -4,11 +4,110 @@ route: /chapter-2
 ---
 
 import Counter from './components/Counter';
+import Kanbananza from './components/Kanbananza';
 
 # Chapter Two: Redux and React
 
-## Create Redux Store
+## Create Redux Store, Connect Redux to React
 
-### Exercise #1: A Simple Counter
+### Exercise 1: A Simple Counter
 
 <Counter />
+
+### Solution
+
+```javascript
+import './styles.css'
+
+import React from 'react'
+import { createStore } from 'redux'
+import { connect, Provider } from 'react-redux'
+
+const initialState = {
+  count: 0
+}
+
+// seems unnecessary, but will blow up if you typo instead of failing silently
+const INCREMENT = 'INCREMENT'
+const DECREMENT = 'DECREMENT'
+const RESET = 'RESET'
+
+const increment = () => ({
+  type: INCREMENT
+})
+
+const decrement = () => ({
+  type: DECREMENT
+})
+
+const reset = () => ({
+  type: RESET
+})
+
+const reducer = (state = initialState, action) => {
+  switch(action.type) {
+    case INCREMENT:
+      return {
+        count: state.count + 1
+      }
+    case DECREMENT:
+      return {
+        count: state.count - 1
+      }
+    case RESET:
+      return {
+        count: 0
+      }
+  }
+
+  return state
+}
+
+const store = createStore(reducer)
+
+const Counter = ({ count, increment, decrement, reset }) => {
+  console.log({ count, increment })
+
+  return (
+    <main className="Counter">
+      <p className="count">{ count }</p>
+      <section className="controls">
+        <button onClick={ increment }>Increment</button>
+        <button onClick={ decrement }>Decrement</button>
+        <button onClick={ reset }>Reset</button>
+      </section>
+    </main>
+  )
+}
+
+// We want to only pass in the props it cares about to as to not trigger rerenders too often
+// Right now that's fine b/c app is smol and state is teeny, later that'll be undesirable
+const mapStateToProps = state => { return state }
+const mapDispatchToProps = {
+  increment,
+  decrement,
+  reset
+}
+
+const CounterContainer = connect(mapStateToProps, mapDispatchToProps)(Counter);
+
+const HOC = () => {
+  return (
+    <Provider store={store}>
+      <CounterContainer />
+    </Provider>
+  )
+}
+
+export default HOC
+```
+
+## Refactoring an App to Use Redux
+
+### React State vs. Redux State
+
+Sometimes, Redux may be a [beefier solution](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) than you need. It adds structure, but it's harder to read and often turns one component into four files. For small apps, and for stuff that's not needed by other components, `useState()` might be best for you. BUT the moment that you need that stuff elsewhere, you're going to wish you had it in a central store. (Um...`useContext()`, anyone?)
+
+### Exercise 2: Implementing a Kanban Board 
+
+<Kanbananza />

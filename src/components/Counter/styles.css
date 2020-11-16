@@ -18,7 +18,7 @@ button:active {
 .Counter {
   box-sizing: border-box;
   font-family: Helvetica, Arial, sans-serif;
-  border: 5px solid lighten(magenta, 40%);
+  border: 5px solid magenta;
   font-weight: 700;
   margin: 2em auto;
   padding: 2em;
