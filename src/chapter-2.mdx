@@ -1,12 +1,11 @@
 ---
-name: Chapter Two - Redux and React
+name: 2 - Redux and React
 route: /chapter-2
 ---
 
 import Counter from './components/Counter';
-import Kanbananza from './components/Kanbananza';
 
-# Chapter Two: Redux and React
+# Chapter 2: Redux and React
 
 ## Create Redux Store, Connect Redux to React
 
@@ -101,13 +100,3 @@ const HOC = () => {
 
 export default HOC
 ```
-
-## Refactoring an App to Use Redux
-
-### React State vs. Redux State
-
-Sometimes, Redux may be a [beefier solution](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) than you need. It adds structure, but it's harder to read and often turns one component into four files. For small apps, and for stuff that's not needed by other components, `useState()` might be best for you. BUT the moment that you need that stuff elsewhere, you're going to wish you had it in a central store. (Um...`useContext()`, anyone?)
-
-### Exercise 2: Implementing a Kanban Board 
-
-<Kanbananza />

@@ -1,29 +1,11 @@
 import React from 'react';
-import List from './List';
+import ListContainer from '../containers/ListContainer';
 
-const Lists = ({
-  lists,
-  users,
-  onRemoveList,
-  onRemoveCard,
-  onCreateCard,
-  onListChange,
-  onAssignCard,
-}) => {
+const Lists = ({ lists = [] }) => {
   return (
     <section className="Lists">
-      {lists.map(list => (
-        <List
-          list={list}
-          lists={lists}
-          key={list.id}
-          users={users}
-          onCreateCard={onCreateCard}
-          onRemoveList={onRemoveList}
-          onRemoveCard={onRemoveCard}
-          onListChange={onListChange}
-          onAssignCard={onAssignCard}
-        />
+      {lists.map((listId) => (
+        <ListContainer listId={listId} />
       ))}
     </section>
   );

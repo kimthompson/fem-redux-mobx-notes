@@ -1,0 +1,92 @@
+---
+name: 3 - Normalizing Our Data
+route: /chapter-3
+---
+
+import Kanbananza from './components/Kanbananza';
+
+# Chapter 3: Normalizing Our Data
+
+## Refactoring an App to Use Redux
+
+### React State vs. Redux State
+
+Sometimes, Redux may be a [beefier solution](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) than you need. It adds structure, but it's harder to read and often turns one component into four files. For small apps, and for stuff that's not needed by other components, `useState()` might be best for you. BUT the moment that you need that stuff elsewhere, you're going to wish you had it in a central store. (Um...`useContext()`, anyone?)
+
+You could also choose to mix and match where appropriate, using regular React state for certain parts of the application.
+
+Another key thing: objects over arrays. It makes it way easier to select a specific object, and almost always proves to be more flexible.
+
+## Exercise 2: Implementing a Kanban Board 
+
+First, we're going to use the [Normalizr](https://github.com/paularmstrong/normalizr) library to restructure our `default-state.json` to be easier to work with in Redux. In particular, it'll refactor things so that instead of each user naving an array of cards, they'll have an array of card ids that will then refer to a card. This makes everything much more performant.
+
+```javascript
+import { schema, normalize } from 'normalizr'
+import defaultState from 'default-state.json'
+
+const user = new schema.Entity('users')
+const card = new schema.Entity('cards', { assignedTo: user })
+const list = new schema.Entity('lists', {
+  cards: [card]
+})
+
+const normalizedLists = normalize(defaultState.lists, [list])
+const normalizedUsers = normalize(defaultState.users, [user])
+
+export const lists = {
+  entities: normalizedLists.entities.lists,
+  ids: normalizedLists.result
+}
+
+export const users = {
+  entities: normalizedUsers.entities.users,
+  ids: normalizedUsers.result
+}
+
+export const cards = {
+  entities: normalizedLists.entities.cards,
+  ids: Object.keys(normalizedLists.entities.cards)
+}
+
+export default {
+  lists,
+  users,
+  cards
+}
+```
+
+## Wiring State Store to the App
+
+We're going to start by getting all the lists and adding the ability to create the new one. Then, as an exercise, you'll create the card and the ability to add some. For this next bit, check out the `reducers` folder:
+
+## Redux DevTools
+
+These are pretty wonderful. Install the Chrome or Firefox extention, then tell the Redux DevTools that they exist. Once you do that though, you no longer need a bunch of console.logs to tell when the store is being hit.
+
+```javascript
+const store = createStore(
+  rootReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION
+)
+```
+
+## Using State Store in Components
+
+Now we're going to need containers for lists and list. This work will be inside the `containers` folder. Each container basically takes a component and `connect`s it to the state, then we go through the app and replace ach instance of, for instance, `<List />` and replace it with `<ListContainer />`.
+
+```javascript
+// containers/ListContainer
+import { connect } from 'react-redux'
+import List from '../components/List'
+
+const mapStateToProps = (state, ownProps) => {
+  return { list: state.lists.entities[ownProps.listId] }
+}
+
+export default connect(mapStateToProps)(List)
+```
+
+## Solution
+
+<Kanbananza />
