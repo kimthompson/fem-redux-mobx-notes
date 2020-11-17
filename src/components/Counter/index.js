@@ -1,4 +1,4 @@
-import './styles.css'
+import counterStyles from './styles.module.css'
 
 import React from 'react'
 import { createStore } from 'redux'
@@ -50,12 +50,12 @@ const Counter = ({ count, increment, decrement, reset }) => {
   console.log({ count, increment })
 
   return (
-    <main className="Counter">
-      <p className="count">{ count }</p>
-      <section className="controls">
-        <button onClick={ increment }>Increment</button>
-        <button onClick={ decrement }>Decrement</button>
-        <button onClick={ reset }>Reset</button>
+    <main className={counterStyles.Counter}>
+      <p className={counterStyles.count}>{ count }</p>
+      <section className={counterStyles.controls}>
+        <button className={counterStyles.button} onClick={ increment }>Increment</button>
+        <button className={counterStyles.button} onClick={ decrement }>Decrement</button>
+        <button className={counterStyles.button} onClick={ reset }>Reset</button>
       </section>
     </main>
   )

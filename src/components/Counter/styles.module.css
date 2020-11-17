@@ -1,4 +1,4 @@
-button {
+.button {
   background-color: magenta;
   border: 5px solid lighten(magenta, 30%);
   color: white;
@@ -7,11 +7,11 @@ button {
   outline: none;
 }
 
-button:hover {
+.button:hover {
   background-color: darken(magenta, 5%);
 }
 
-button:active {
+.button:active {
   background-color: darken(magenta, 10%);
 }
 
