@@ -9,7 +9,7 @@ import Application from './components/Application'
 
 const store = createStore(
   rootReducer,
-  //window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION()
+  //window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION
 )
 
 const HOC = () => {

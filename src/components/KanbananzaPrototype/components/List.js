@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CardsContainer from '../containers/CardsContainer';
+import CardContainer from '../containers/CardContainer';
 import CreateCardContainer from '../containers/CreateCardContainer';
 
 const List = ({ list = {}, removeList }) => {
@@ -10,15 +10,9 @@ const List = ({ list = {}, removeList }) => {
       <CreateCardContainer listId={list.id} />
       <div>
         {list.cards.map(cardId => (
-          <CardsContainer key={cardId} cardId={cardId} listId={list.id} />
+          <CardContainer key={cardId} cardId={cardId} listId={list.id} />
         ))}
       </div>
-      <button
-        onClick={() => removeList(list.id)}
-        className="List-remove danger"
-      >
-        Remove List
-      </button>
     </article>
   );
 };

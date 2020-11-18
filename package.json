@@ -1,5 +1,5 @@
 {
-  "name": "docz-example-basic",
+  "name": "fem-state-management-redux-mobx-notes",
   "version": "2.0.0",
   "license": "MIT",
   "scripts": {
@@ -22,6 +22,7 @@
     "redux": "^4.0.5",
     "redux-observable": "^1.1.0",
     "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
     "rxjs": "^6.5.2"
   }
 }

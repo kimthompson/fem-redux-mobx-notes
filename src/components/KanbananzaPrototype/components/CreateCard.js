@@ -6,7 +6,7 @@ class CreateCard extends Component {
     description: '',
   };
 
-  handleChange = event => {
+  handleChange = (event) => {
     const { name, value } = event.target;
     this.setState({ [name]: value });
   };
@@ -20,15 +20,15 @@ class CreateCard extends Component {
     return !this.isValid;
   }
 
-  handleSubmit = event => {
+  handleSubmit = (event) => {
     event.preventDefault();
 
     if (this.isInvalid) return;
 
-    const { createCard } = this.props;
+    const { createCard, listId } = this.props;
 
     if (createCard) {
-      createCard(this.props.listId, this.state);
+      createCard(listId, this.state);
     }
 
     this.setState({
