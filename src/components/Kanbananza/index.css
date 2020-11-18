@@ -25,6 +25,7 @@ html, body, * {
 }
  input {
 	 background-color: white;
+   font-size: 14px;
 	 border: 1px solid #e6e6e6;
 	 margin: 0.5em 0;
 	 outline: none;
@@ -36,6 +37,8 @@ html, body, * {
 }
  button, input[type='submit'] {
 	 background-color: #c6d8d3;
+   font-size: 14px;
+   font-weight: bold;
 	 border: 1px solid #a8c3bc;
 	 margin: 0.5em 0;
 	 outline: none;

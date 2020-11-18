@@ -87,6 +87,65 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps)(List)
 ```
 
+## Implementing Map Dispatch to Props
+
+What he means by this title is he's showing us how to add the ability to create a card.
+
+Caveat: For form management, he's going to use normal React state. Doing it via Redux gains us no efficiency and overcomplicates things.
+
+We ended up doing this in the `list-reducer`, and I weep.
+
+```javascript
+import { lists as defaultLists } from '../normalized-state'
+
+const listsReducer = (lists = defaultLists, action) => {
+  if (action.type === 'CARD_CREATE') {
+    const { cardId, listId } = action.payload
+    const entities = { ...lists.entities }
+
+    entities[listId] = {
+      ...entities[listId],
+      cards: entities[listId].cards.concat(cardId)
+    }
+
+    return {
+      ...lists,
+      entities
+    }
+  }
+
+  return lists
+}
+
+export default listsReducer
+```
+
+You could avoid this annoyance by using something like [Immutable.js](https://immutable-js.github.io/immutable-js/), or you can use the `set` function from [lodash](https://lodash.com/docs/4.17.15#set) (which is different from the native ES6 one in that it won't mutate the object).
+
+```javascript
+import { lists as defaultLists } from '../normalized-state'
+import set from 'lodash/fp/set'
+
+const listsReducer = (lists = defaultLists, action) => {
+  if (action.type === 'CARD_CREATE') {
+    const { cardId, listId } = action.payload
+
+    const cards = lists.entities[listId].cards.concat(cardId)
+    return set(['entities', listId, 'cards'], cards, lists)
+  }
+
+  return lists
+}
+
+export default listsReducer
+```
+
+Much better.
+
+## Action Creator Helpers
+
+On this branch that he didn't push up, he abstracted the above work away into the utility functions `addEntity` and `addIdToChildren`, which both use lodash functions.
+
 ## Solution
 
 <Kanbananza />
